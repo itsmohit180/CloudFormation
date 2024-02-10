@@ -1,0 +1,27 @@
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: !FindInMap
+        - RegionMap1
+        - !Ref AWS::Region
+        - AMI
+      InstanceType: t2.micro
+      KeyName: !Ref KeyPair1
+      Tags: 
+        - Key: Createdby
+          Value: Mohit
+          
+  KeyPair1:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: KeyForEC2Instance
+
+#---------------------------------
+      
+Mappings:
+  RegionMap1:
+    ap-south-1:
+      AMI: ami-062df10d14676e201
+    us-east-2:
+      AMI: ami-097a2df4ac947655f

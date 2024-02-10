@@ -1,0 +1,63 @@
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: !FindInMap
+        - AMIMap1
+        - !Ref AWS::Region
+        - !Ref AMIParameter
+      InstanceType: !FindInMap
+        - InstanceMap1
+        - !Ref AWS::Region
+        - !Ref InstanceParameter
+      KeyName: !Ref KeyPair1
+      Tags: 
+        - Key: Createdby
+          Value: Mohit
+          
+  KeyPair1:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: KeyForEC2Instance
+
+#---------------------------------
+      
+Mappings:
+  AMIMap1:
+    ap-south-1:
+      Ubuntu: ami-062df10d14676e201
+      RHEL: ami-069d9fecd19e7ed40
+      SUSE: ami-08ec390ae500191e6
+    us-east-2:
+      Ubuntu: ami-097a2df4ac947655f
+      RHEL: ami-08d616b7fbe4bb9d0
+      SUSE: ami-0535d9b70179f9734
+      
+  InstanceMap1:
+    ap-south-1:
+      Dev: t2.micro
+      Prod: t3.micro
+    us-east-2:
+      Dev: t2.micro
+      Prod: t3.micro
+      
+#---------------------
+
+Parameters:
+  InstanceParameter:
+    Type: String
+    Default: Dev
+    AllowedValues:
+      - Dev
+      - Prod
+    Description: Choose the Environment
+    
+  AMIParameter:
+    Type: String
+    Default: Ubuntu
+    AllowedValues:
+      - Ubuntu
+      - RHEL
+      - SUSE
+    Description: Choose the OS
+    

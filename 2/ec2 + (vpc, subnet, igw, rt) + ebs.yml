@@ -1,0 +1,98 @@
+Resources:
+  EC2Instance1:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: ami-062df10d14676e201
+      InstanceType: t2.micro
+      KeyName: !Ref KeyPair1
+      SubnetId: !Ref Subnet1
+      SecurityGroupIds:
+        - !Ref SG1
+      Tags: 
+        - Key: Purpose
+          Value: Testing
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          apt install apache2 -y
+          echo "Hello" > /var/www/html/index.html
+      BlockDeviceMappings:
+          # root volume
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 10
+            VolumeType: gp2
+          # additional volume
+        - DeviceName: /dev/sdb
+          Ebs:
+            VolumeSize: 25
+            VolumeType: gp2
+          
+  KeyPair1:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: KeyPair1
+
+#------------------------
+     
+  SG1:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: sg for apache web server
+      VpcId: !Ref VPC1
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      
+#----------------------------
+
+  VPC1:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 11.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      
+  Subnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC1
+      CidrBlock: 11.0.0.0/20
+      AvailabilityZone: ap-south-1a
+      MapPublicIpOnLaunch: true
+      
+  InternetGateway1:
+    Type: AWS::EC2::InternetGateway
+    
+  InternetGatewayAttachment1:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway1
+      VpcId: !Ref VPC1
+      
+  RouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC1
+      
+  Routes1:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment1
+    Properties:
+      RouteTableId: !Ref RouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway1
+      
+  SubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet1
+      RouteTableId: !Ref RouteTable1
+      

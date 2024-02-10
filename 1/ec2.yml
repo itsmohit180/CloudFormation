@@ -1,0 +1,12 @@
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: ami-062df10d14676e201
+      InstanceType: t2.micro
+      KeyName: KeyPair1_Mumbai
+      SecurityGroupIds:
+        - sg-024c9e4e0bf3e7d27
+      Tags: 
+        - Key: Createdby
+          Value: mohit

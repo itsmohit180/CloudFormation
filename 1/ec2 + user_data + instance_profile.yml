@@ -1,0 +1,19 @@
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: ami-062df10d14676e201
+      InstanceType: t2.micro
+      KeyName: KeyPair1_Mumbai
+      SubnetId: subnet-0db193199dadc9d00
+      SecurityGroupIds:
+        - sg-01e7096b2220c79f7
+      Tags: 
+        - Key: Createdby
+          Value: mohit
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          apt install apache2 -y
+          echo "Hello" > /var/www/html/index.html
+      IamInstanceProfile: s3-full-access
